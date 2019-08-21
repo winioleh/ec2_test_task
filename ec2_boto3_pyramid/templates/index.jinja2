@@ -1,0 +1,83 @@
+</html><!DOCTYPE html>
+<html lang="en" xmlns:tal="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Test Task</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+</head>
+<body>
+
+<h3 style="text-align:center"> List of all EC2 instances</h3>
+      {% for item in response %}
+        <div style="border: 2px solid black; padding:20px; margin:10px">
+        <div class="list-group">
+            <p class="list-group-item list-group-item-action active"  >Region: <b> {{item.region}} </b></p>
+            <p class="list-group-item list-group-item-action">ID: <b> {{item.id}} </b></p>
+            <p class="list-group-item list-group-item-action">State: <b> {{item.state.Name}} </b></p>
+            <p class="list-group-item list-group-item-action">Launch Time: <b> {{item.launch_time}} </b></p>
+            <p class="list-group-item list-group-item-action">Architecture: <b> {{item.architecture}} </b></p>
+            <p class="list-group-item list-group-item-action">Root Device Name: <b> {{item.root_device_name}}</b></p>
+            <p class="list-group-item list-group-item-action">Private IP Address: <b> {{item.private_ip_address}} </b></p>
+            <br>
+         </div>
+         <h5 >Enter IP for blocking inbound access</h5>
+            <input type="text" id="{{item.id}}" placeholder="Enter IP">
+            <input type="radio" id="outbound_{{item.id}}" value="outbound">
+            <label for="outbound_{{item.id}}">Outbound Access</label>
+            <input type="radio" id="inbound_{{item.id}}" value="inbound">
+            <label for="inbound_{{item.id}}">Inbound Access</label>
+            <input type="button" id="block_btn" value="Block" onclick="block('{{item.region}}', '{{item.acl_ids}}', '{{item.id}}' )">
+            <br>
+            <div style="" class="list-group">
+                <h4 class="list-group-item list-group-item-action active" >Security Groups</h4>
+                {% for group in item.security_info.SecurityGroups %}
+                    <p class="list-group-item list-group-item-action">Description: <b>{{group.Description}}</b></p>
+                    <p class="list-group-item list-group-item-action">Group Name: <b>{{group.GroupName}}</b></p>
+                    <p class="list-group-item list-group-item-action">Group Id: <b>{{group.GroupId}}</b></p>
+                    <p class="list-group-item list-group-item-action">Vpc Id: <b>{{group.VpcId}}</b></p>
+                    <br>
+                {% endfor %}
+            </div>
+
+            <div class="list-group">
+                <h4 class="list-group-item list-group-item-action active">NetworkAcls</h4>
+                {% for acl in item.network_acls.NetworkAcls %}
+                    {% for entry in acl.Entries %}
+                        <p class="list-group-item list-group-item-action">CidrBlock: <b>{{entry.CidrBlock}}</b></p>
+                        <p class="list-group-item list-group-item-action">Egress: <b>{{entry.Egress}}</b></p>
+                        <p class="list-group-item list-group-item-action">RuleAction: <b>{{entry.RuleAction}}</b></p>
+                        <p class="list-group-item list-group-item-action">RuleNumber: <b>{{entry.RuleNumber}}</b></p>
+                        <p></p>
+                    {% endfor %}
+                {% endfor %}
+
+            </div>
+        </div>
+    {% endfor %}
+
+<script>
+
+    function block(region,acl_ids, item_id){
+        ip_value = document.getElementById(item_id).value
+        inbound_btn = document.getElementById("outbound_"+item_id).checked
+        outbound_btn = document.getElementById("inbound_"+item_id).checked
+
+        url = "http://0.0.0.0:6543/api/block_access"
+        data = {
+            "acl_ids":acl_ids,
+            "region": region,
+            "ip_value": ip_value,
+            "inbound_btn":inbound_btn,
+            "outbound_btn":outbound_btn
+        }
+        $.post(url, JSON.stringify(data), function(data,status){
+            console.log('{{data}} and status {{status}}')
+            location.reload();
+            });
+    };
+
+</script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+
+</body>
+</html>
