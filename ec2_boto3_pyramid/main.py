@@ -9,7 +9,7 @@ def index_view(request):
     session = boto3.Session()
     ec2_regions = session.get_available_regions(service_name='ec2')
     response = []
-
+    errors = []
     for region in ec2_regions:
         ec2 = boto3.resource('ec2', region_name=region)
         instances = ec2.instances.all()
@@ -38,5 +38,5 @@ def index_view(request):
                 if instance_info:
                     response.append(instance_info)
         except Exception as e:
-            pass
-    return {"response": response}
+            errors.append(str(e))
+    return {"response": response, "errors": errors}

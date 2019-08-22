@@ -8,6 +8,10 @@
 <body>
 
 <h3 style="text-align:center"> List of all EC2 instances</h3>
+      {% for item in errors %}
+        <p>{{item}}</p>
+      {% endfor %}
+
       {% for item in response %}
         <div style="border: 2px solid black; padding:20px; margin:10px">
         <div class="list-group">
