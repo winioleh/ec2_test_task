@@ -38,5 +38,5 @@ def index_view(request):
                 if instance_info:
                     response.append(instance_info)
         except Exception as e:
-            errors.append(str(e))
+            pass
     return {"response": response, "errors": errors}
