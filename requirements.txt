@@ -25,7 +25,7 @@ pyramid-chameleon==0.3
 pyramid-jinja2==2.8
 pyramid-services==2.2
 python-dateutil==2.8.0
-PyYAML==5.1.2
+PyYAML==5.4
 rsa==3.4.2
 s3transfer==0.2.1
 six==1.12.0
